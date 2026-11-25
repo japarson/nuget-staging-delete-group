@@ -6,7 +6,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $uri = 'https://www.nuget.org/api/v3/staging/groups/' + [Uri]::EscapeDataString($GroupId)
-$secureKey = Read-Host 'API key owned by the staging organization, with staging permission for every package in the group' -AsSecureString
+if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) {
+    $secureKey = Read-Host 'API key owned by the staging organization, with staging permission for every package in the group' -AsSecureString
+}
+else {
+    $secureKey = ConvertTo-SecureString -String $env:NUGET_API_KEY -AsPlainText -Force
+}
 $headers = @{ 'X-NuGet-ApiKey' = [System.Net.NetworkCredential]::new('', $secureKey).Password }
 
 try {
