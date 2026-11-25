@@ -16,7 +16,12 @@ if ($Symbols) {
 }
 
 $uri = 'https://www.nuget.org/api/v3/staging/' + $kind + '/' + [Uri]::EscapeDataString($PackageId) + '/' + [Uri]::EscapeDataString($Version)
-$secureKey = Read-Host 'API key for the staging owner, with staging permission for this package' -AsSecureString
+if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) {
+    $secureKey = Read-Host 'API key for the staging owner, with staging permission for this package' -AsSecureString
+}
+else {
+    $secureKey = ConvertTo-SecureString -String $env:NUGET_API_KEY -AsPlainText -Force
+}
 $headers = @{ 'X-NuGet-ApiKey' = [System.Net.NetworkCredential]::new('', $secureKey).Password }
 
 try {
